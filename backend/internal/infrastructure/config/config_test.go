@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"testing"
+	"time"
 )
 
 func TestLoad(t *testing.T) {
@@ -14,6 +15,10 @@ func TestLoad(t *testing.T) {
 	os.Setenv("DB_PASSWORD", "testpass")
 	os.Setenv("DB_NAME", "testdb")
 	os.Setenv("DB_SSLMODE", "require")
+	os.Setenv("DB_MAX_OPEN_CONNS", "50")
+	os.Setenv("DB_MAX_IDLE_CONNS", "15")
+	os.Setenv("DB_CONN_MAX_LIFETIME", "1h")
+	os.Setenv("DB_CONN_MAX_IDLE_TIME", "30m")
 	os.Setenv("LOG_LEVEL", "debug")
 
 	defer func() {
@@ -24,6 +29,10 @@ func TestLoad(t *testing.T) {
 		os.Unsetenv("DB_PASSWORD")
 		os.Unsetenv("DB_NAME")
 		os.Unsetenv("DB_SSLMODE")
+		os.Unsetenv("DB_MAX_OPEN_CONNS")
+		os.Unsetenv("DB_MAX_IDLE_CONNS")
+		os.Unsetenv("DB_CONN_MAX_LIFETIME")
+		os.Unsetenv("DB_CONN_MAX_IDLE_TIME")
 		os.Unsetenv("LOG_LEVEL")
 	}()
 
@@ -48,6 +57,22 @@ func TestLoad(t *testing.T) {
 		t.Errorf("Database.SSLMode = %v, want require", cfg.Database.SSLMode)
 	}
 
+	if cfg.Database.MaxOpenConns != 50 {
+		t.Errorf("Database.MaxOpenConns = %v, want 50", cfg.Database.MaxOpenConns)
+	}
+
+	if cfg.Database.MaxIdleConns != 15 {
+		t.Errorf("Database.MaxIdleConns = %v, want 15", cfg.Database.MaxIdleConns)
+	}
+
+	if cfg.Database.ConnMaxLifetime != time.Hour {
+		t.Errorf("Database.ConnMaxLifetime = %v, want 1h", cfg.Database.ConnMaxLifetime)
+	}
+
+	if cfg.Database.ConnMaxIdleTime != 30*time.Minute {
+		t.Errorf("Database.ConnMaxIdleTime = %v, want 30m", cfg.Database.ConnMaxIdleTime)
+	}
+
 	if cfg.Log.Level != "debug" {
 		t.Errorf("Log.Level = %v, want debug", cfg.Log.Level)
 	}
@@ -61,6 +86,10 @@ func TestLoadDefaults(t *testing.T) {
 	os.Unsetenv("DB_USER")
 	os.Unsetenv("DB_NAME")
 	os.Unsetenv("DB_SSLMODE")
+	os.Unsetenv("DB_MAX_OPEN_CONNS")
+	os.Unsetenv("DB_MAX_IDLE_CONNS")
+	os.Unsetenv("DB_CONN_MAX_LIFETIME")
+	os.Unsetenv("DB_CONN_MAX_IDLE_TIME")
 	os.Unsetenv("LOG_LEVEL")
 
 	cfg, err := Load()
@@ -80,12 +109,20 @@ func TestLoadDefaults(t *testing.T) {
 		t.Errorf("Database.SSLMode default = %v, want disable", cfg.Database.SSLMode)
 	}
 
-	if cfg.Database.MaxOpenConns != 25 {
-		t.Errorf("Database.MaxOpenConns default = %v, want 25", cfg.Database.MaxOpenConns)
+	if cfg.Database.MaxOpenConns != 100 {
+		t.Errorf("Database.MaxOpenConns default = %v, want 100", cfg.Database.MaxOpenConns)
 	}
 
-	if cfg.Database.MaxIdleConns != 5 {
-		t.Errorf("Database.MaxIdleConns default = %v, want 5", cfg.Database.MaxIdleConns)
+	if cfg.Database.MaxIdleConns != 10 {
+		t.Errorf("Database.MaxIdleConns default = %v, want 10", cfg.Database.MaxIdleConns)
+	}
+
+	if cfg.Database.ConnMaxLifetime != 30*time.Minute {
+		t.Errorf("Database.ConnMaxLifetime default = %v, want 30m", cfg.Database.ConnMaxLifetime)
+	}
+
+	if cfg.Database.ConnMaxIdleTime != 10*time.Minute {
+		t.Errorf("Database.ConnMaxIdleTime default = %v, want 10m", cfg.Database.ConnMaxIdleTime)
 	}
 
 	if cfg.Log.Level != "info" {

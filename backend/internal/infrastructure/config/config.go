@@ -23,14 +23,16 @@ type ServerConfig struct {
 
 // DatabaseConfig holds database connection configuration
 type DatabaseConfig struct {
-	Host         string
-	Port         int
-	User         string
-	Password     string
-	Name         string
-	SSLMode      string
-	MaxOpenConns int
-	MaxIdleConns int
+	Host            string
+	Port            int
+	User            string
+	Password        string
+	Name            string
+	SSLMode         string
+	MaxOpenConns    int
+	MaxIdleConns    int
+	ConnMaxLifetime time.Duration
+	ConnMaxIdleTime time.Duration
 }
 
 // LogConfig holds logging configuration
@@ -52,8 +54,10 @@ func Load() (*Config, error) {
 	viper.SetDefault("DB_USER", "postgres")
 	viper.SetDefault("DB_NAME", "saas_openclaw")
 	viper.SetDefault("DB_SSLMODE", "disable")
-	viper.SetDefault("DB_MAX_OPEN_CONNS", 25)
-	viper.SetDefault("DB_MAX_IDLE_CONNS", 5)
+	viper.SetDefault("DB_MAX_OPEN_CONNS", 100)
+	viper.SetDefault("DB_MAX_IDLE_CONNS", 10)
+	viper.SetDefault("DB_CONN_MAX_LIFETIME", "30m")
+	viper.SetDefault("DB_CONN_MAX_IDLE_TIME", "10m")
 	viper.SetDefault("LOG_LEVEL", "info")
 
 	// Read from environment variables
@@ -73,14 +77,16 @@ func Load() (*Config, error) {
 			WriteTimeout: 15 * time.Second,
 		},
 		Database: DatabaseConfig{
-			Host:         viper.GetString("DB_HOST"),
-			Port:         viper.GetInt("DB_PORT"),
-			User:         viper.GetString("DB_USER"),
-			Password:     viper.GetString("DB_PASSWORD"),
-			Name:         viper.GetString("DB_NAME"),
-			SSLMode:      viper.GetString("DB_SSLMODE"),
-			MaxOpenConns: viper.GetInt("DB_MAX_OPEN_CONNS"),
-			MaxIdleConns: viper.GetInt("DB_MAX_IDLE_CONNS"),
+			Host:            viper.GetString("DB_HOST"),
+			Port:            viper.GetInt("DB_PORT"),
+			User:            viper.GetString("DB_USER"),
+			Password:        viper.GetString("DB_PASSWORD"),
+			Name:            viper.GetString("DB_NAME"),
+			SSLMode:         viper.GetString("DB_SSLMODE"),
+			MaxOpenConns:    viper.GetInt("DB_MAX_OPEN_CONNS"),
+			MaxIdleConns:    viper.GetInt("DB_MAX_IDLE_CONNS"),
+			ConnMaxLifetime: viper.GetDuration("DB_CONN_MAX_LIFETIME"),
+			ConnMaxIdleTime: viper.GetDuration("DB_CONN_MAX_IDLE_TIME"),
 		},
 		Log: LogConfig{
 			Level: viper.GetString("LOG_LEVEL"),

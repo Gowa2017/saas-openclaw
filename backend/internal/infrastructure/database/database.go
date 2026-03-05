@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -24,6 +25,23 @@ func Connect(cfg *config.DatabaseConfig) (*sqlx.DB, error) {
 	// Configure connection pool from config
 	db.SetMaxOpenConns(cfg.MaxOpenConns)
 	db.SetMaxIdleConns(cfg.MaxIdleConns)
+	db.SetConnMaxLifetime(cfg.ConnMaxLifetime)
+	db.SetConnMaxIdleTime(cfg.ConnMaxIdleTime)
 
 	return db, nil
+}
+
+// Ping checks if the database connection is alive
+func Ping(db *sqlx.DB) error {
+	return db.Ping()
+}
+
+// Stats returns database connection pool statistics
+func Stats(db *sqlx.DB) sql.DBStats {
+	return db.Stats()
+}
+
+// Close closes the database connection
+func Close(db *sqlx.DB) error {
+	return db.Close()
 }

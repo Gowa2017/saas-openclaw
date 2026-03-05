@@ -12,7 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
+	"github.com/gowa/saas-openclaw/backend/internal/api/health"
 	"github.com/gowa/saas-openclaw/backend/internal/infrastructure/config"
+	"github.com/gowa/saas-openclaw/backend/internal/infrastructure/database"
 	customLogger "github.com/gowa/saas-openclaw/backend/pkg/logger"
 	"github.com/gowa/saas-openclaw/backend/pkg/middleware"
 )
@@ -37,14 +39,20 @@ func main() {
 		}
 	}()
 
-	// TODO: Initialize database connection (Story 1.2)
-	// db, err := database.Connect(&cfg.Database)
-	// if err != nil {
-	//     logger.Fatal("Failed to connect to database", zap.Error(err))
-	// }
-	// defer db.Close()
+	// Initialize database connection
+	db, err := database.Connect(&cfg.Database)
+	if err != nil {
+		logger.Fatal("Failed to connect to database", zap.Error(err))
+	}
+	defer func() {
+		if err := database.Close(db); err != nil {
+			logger.Error("Failed to close database connection", zap.Error(err))
+		}
+	}()
 
-	// TODO: Initialize validator for request validation (Story 1.3)
+	logger.Info("Database connection established")
+
+	// TODO: Initialize validator for request validation
 	// val, err := validator.New()
 	// if err != nil {
 	//     logger.Fatal("Failed to initialize validator", zap.Error(err))
@@ -54,13 +62,17 @@ func main() {
 	router := gin.New()
 	router.Use(middleware.Logger(logger), middleware.Recovery(logger))
 
-	// Health check endpoint
+	// Health check endpoints
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"time":   time.Now().UTC().Format(time.RFC3339),
 		})
 	})
+
+	// Database health check endpoint
+	healthHandler := health.NewHandler(db, &cfg.Database)
+	router.GET("/health/database", healthHandler.Database)
 
 	// API v1 routes
 	v1 := router.Group("/v1")
