@@ -52,62 +52,62 @@ development_status:
   # Epic 2: 用户认证与授权
   epic-2: in-progress
   2-1-user-data-model: ready-for-dev
-  2-2-jwt-token-middleware: backlog
-  2-3-user-info-tenant-identify: backlog
-  2-4-admin-auth-system: backlog
-  2-5-frontend-login-page: backlog
-  2-6-admin-login-page: backlog
+  2-2-jwt-token-middleware: ready-for-dev
+  2-3-user-info-tenant-identify: ready-for-dev
+  2-4-admin-auth-system: ready-for-dev
+  2-5-frontend-login-page: ready-for-dev
+  2-6-admin-login-page: ready-for-dev
   epic-2-retrospective: optional
 
   # Epic 3: 飞书应用配置
-  epic-3: backlog
-  3-1-feishu-config-model: backlog
-  3-2-feishu-config-crud-api: backlog
-  3-3-feishu-config-validation: backlog
-  3-4-feishu-config-frontend: backlog
-  3-5-feishu-config-tutorial: backlog
+  epic-3: in-progress
+  3-1-feishu-config-model: ready-for-dev
+  3-2-feishu-config-crud-api: ready-for-dev
+  3-3-feishu-config-validation: ready-for-dev
+  3-4-feishu-config-frontend: ready-for-dev
+  3-5-feishu-config-tutorial: ready-for-dev
   epic-3-retrospective: optional
 
   # Epic 4: OpenClaw 实例管理
-  epic-4: backlog
-  4-1-instance-data-model: backlog
-  4-2-dokploy-api-client: backlog
-  4-3-one-click-deploy: backlog
-  4-4-deploy-status-tracking: backlog
-  4-5-deploy-error-handling: backlog
-  4-6-user-instance-list: backlog
-  4-7-admin-instance-manage: backlog
+  epic-4: in-progress
+  4-1-instance-data-model: ready-for-dev
+  4-2-dokploy-api-client: ready-for-dev
+  4-3-one-click-deploy: ready-for-dev
+  4-4-deploy-status-tracking: ready-for-dev
+  4-5-deploy-error-handling: ready-for-dev
+  4-6-user-instance-list: ready-for-dev
+  4-7-admin-instance-manage: ready-for-dev
   epic-4-retrospective: optional
 
   # Epic 5: 飞书机器人集成
-  epic-5: backlog
-  5-1-feishu-sdk-integration: backlog
-  5-2-message-routing: backlog
-  5-3-message-sending: backlog
-  5-4-feishu-bot-tutorial: backlog
+  epic-5: in-progress
+  5-1-feishu-sdk-integration: ready-for-dev
+  5-2-message-routing: ready-for-dev
+  5-3-message-sending: ready-for-dev
+  5-4-feishu-bot-tutorial: ready-for-dev
   epic-5-retrospective: optional
 
   # Epic 6: 数据备份与恢复
-  epic-6: backlog
-  6-1-user-config-backup: backlog
-  6-2-instance-data-backup: backlog
-  6-3-backup-status-api: backlog
-  6-4-config-restore: backlog
+  epic-6: in-progress
+  6-1-user-config-backup: ready-for-dev
+  6-2-instance-data-backup: ready-for-dev
+  6-3-backup-status-api: ready-for-dev
+  6-4-config-restore: ready-for-dev
   epic-6-retrospective: optional
 
   # Epic 7: 平台监控与运维
-  epic-7: backlog
-  7-1-dashboard-data-api: backlog
-  7-2-dashboard-frontend: backlog
-  7-3-instance-log-viewer: backlog
-  7-4-alert-system: backlog
-  7-5-system-notification: backlog
+  epic-7: in-progress
+  7-1-dashboard-data-api: ready-for-dev
+  7-2-dashboard-frontend: ready-for-dev
+  7-3-instance-log-viewer: ready-for-dev
+  7-4-alert-system: ready-for-dev
+  7-5-system-notification: ready-for-dev
   epic-7-retrospective: optional
 
   # Epic 8: 用户引导与帮助
-  epic-8: backlog
-  8-1-feishu-platform-tutorial: backlog
-  8-2-feishu-bot-add-tutorial: backlog
-  8-3-first-visit-guide: backlog
-  8-4-help-center: backlog
+  epic-8: in-progress
+  8-1-feishu-platform-tutorial: ready-for-dev
+  8-2-feishu-bot-add-tutorial: ready-for-dev
+  8-3-first-visit-guide: ready-for-dev
+  8-4-help-center: ready-for-dev
   epic-8-retrospective: optional
