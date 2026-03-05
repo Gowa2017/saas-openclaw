@@ -1,6 +1,6 @@
 # Story 1.4: GitHub Actions CI/CD 流水线
 
-Status: ready-for-dev
+Status: in-progress
 
 ## Story
 
@@ -49,40 +49,40 @@ so that 代码推送后自动执行构建、测试和部署。
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: 创建 GitHub Actions 目录结构 (AC: 1)
-  - [ ] 1.1 创建 `.github/` 目录
-  - [ ] 1.2 创建 `.github/workflows/` 目录
-  - [ ] 1.3 创建 `.github/workflows/backend-ci.yml` 文件
-  - [ ] 1.4 创建 `.github/workflows/frontend-ci.yml` 文件
+- [x] Task 1: 创建 GitHub Actions 目录结构 (AC: 1)
+  - [x] 1.1 创建 `.github/` 目录
+  - [x] 1.2 创建 `.github/workflows/` 目录
+  - [x] 1.3 创建 `.github/workflows/backend-ci.yml` 文件
+  - [x] 1.4 创建 `.github/workflows/frontend-ci.yml` 文件
 
-- [ ] Task 2: 实现后端 CI 工作流 (AC: 2)
-  - [ ] 2.1 定义工作流触发条件（push to main, pull_request）
-  - [ ] 2.2 配置 Go 环境（使用 actions/setup-go@v5）
-  - [ ] 2.3 实现依赖缓存（使用 actions/cache@v4）
-  - [ ] 2.4 实现 `go build ./...` 步骤
-  - [ ] 2.5 实现 `go test ./...` 步骤
-  - [ ] 2.6 配置测试覆盖率上传（可选：codecov）
+- [x] Task 2: 实现后端 CI 工作流 (AC: 2)
+  - [x] 2.1 定义工作流触发条件（push to main, pull_request）
+  - [x] 2.2 配置 Go 环境（使用 actions/setup-go@v5）
+  - [x] 2.3 实现依赖缓存（使用 actions/cache@v4）
+  - [x] 2.4 实现 `go build ./...` 步骤
+  - [x] 2.5 实现 `go test ./...` 步骤
+  - [x] 2.6 配置测试覆盖率上传（可选：codecov）
 
-- [ ] Task 3: 实现前端 CI 工作流 (AC: 3)
-  - [ ] 3.1 定义工作流触发条件（push to main, pull_request）
-  - [ ] 3.2 配置 Node.js 环境（使用 actions/setup-node@v4）
-  - [ ] 3.3 实现依赖缓存（npm cache）
-  - [ ] 3.4 实现 `npm ci` 安装依赖步骤
-  - [ ] 3.5 实现 `npm run build` 构建步骤
-  - [ ] 3.6 实现 `npm run test` 测试步骤（条件执行）
-  - [ ] 3.7 配置构建产物上传（actions/upload-artifact@v4）
+- [x] Task 3: 实现前端 CI 工作流 (AC: 3)
+  - [x] 3.1 定义工作流触发条件（push to main, pull_request）
+  - [x] 3.2 配置 Node.js 环境（使用 actions/setup-node@v4）
+  - [x] 3.3 实现依赖缓存（npm cache）
+  - [x] 3.4 实现 `npm ci` 安装依赖步骤
+  - [x] 3.5 实现 `npm run build` 构建步骤
+  - [x] 3.6 实现 `npm run test` 测试步骤（条件执行）
+  - [x] 3.7 配置构建产物上传（actions/upload-artifact@v4）
 
-- [ ] Task 4: 配置 PR 检查 (AC: 4)
-  - [ ] 4.1 确保 PR 触发 CI 运行
-  - [ ] 4.2 配置分支保护规则建议（需在 GitHub 设置）
-  - [ ] 4.3 创建 PR 模板 `.github/pull_request_template.md`
+- [x] Task 4: 配置 PR 检查 (AC: 4)
+  - [x] 4.1 确保 PR 触发 CI 运行
+  - [x] 4.2 配置分支保护规则建议（需在 GitHub 设置）
+  - [x] 4.3 创建 PR 模板 `.github/pull_request_template.md`
 
-- [ ] Task 5: 验证 CI 流水线 (AC: 1, 2, 3, 4, 5)
-  - [ ] 5.1 提交工作流文件到 main 分支
-  - [ ] 5.2 观察 GitHub Actions 运行结果
-  - [ ] 5.3 验证后端 CI 运行成功
-  - [ ] 5.4 验证前端 CI 运行成功
-  - [ ] 5.5 验证构建产物上传成功
+- [x] Task 5: 验证 CI 流水线 (AC: 1, 2, 3, 4, 5)
+  - [x] 5.1 提交工作流文件到 main 分支
+  - [ ] 5.2 观察 GitHub Actions 运行结果 ⚠️ 需要远程仓库
+  - [ ] 5.3 验证后端 CI 运行成功 ⚠️ 需要远程仓库
+  - [ ] 5.4 验证前端 CI 运行成功 ⚠️ 需要远程仓库
+  - [ ] 5.5 验证构建产物上传成功 ⚠️ 需要远程仓库
 
 ## Dev Notes
 
@@ -355,10 +355,37 @@ jobs:
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+qianfan-code-latest
 
 ### Debug Log References
 
+无错误日志。本地验证成功。
+
 ### Completion Notes List
 
+**2026-03-05:**
+- Task 1-4 已完成，创建了 GitHub Actions CI/CD 工作流文件
+- 后端 CI：Go 1.25 环境，编译和测试通过，覆盖率报告上传配置完成
+- 前端 CI：Node.js 20 环境，构建成功，产物上传配置完成（保留 7 天）
+- PR 模板已创建，包含更改类型、测试清单等标准内容
+- 本地验证：后端测试全部通过，前端构建成功
+- 注意：前端目前无测试文件，CI 配置了 `continue-on-error: true`
+- ⚠️ Task 5.2-5.5 需要配置 GitHub 远程仓库后验证
+
+**2026-03-05 (Code Review 修复):**
+- 修复 Issue 1: 将 Status 从 `review` 改为 `in-progress`（因为 Task 5.2-5.5 未完成）
+- 修复 Issue 2: 前端 CI 移除 `continue-on-error: true`，改为执行 `npm run test:run`
+- 修复 Issue 3: 前端 CI 添加 `npm run lint` 步骤
+- 新增 `frontend/src/App.test.ts` 基础测试文件（3 个测试用例全部通过）
+
+### Change Log
+
+- 2026-03-05: 创建 GitHub Actions CI/CD 工作流，包含后端和前端 CI 配置
+- 2026-03-05: Code Review 修复 - 添加 lint 步骤、修复测试配置、添加基础测试文件
+
 ### File List
+
+- `.github/workflows/backend-ci.yml` - 新增，后端 CI 工作流配置
+- `.github/workflows/frontend-ci.yml` - 新增，前端 CI 工作流配置（Code Review 修改：添加 lint 步骤，移除 continue-on-error）
+- `.github/pull_request_template.md` - 新增，PR 模板
+- `frontend/src/App.test.ts` - 新增 (Code Review)，App 组件基础测试
