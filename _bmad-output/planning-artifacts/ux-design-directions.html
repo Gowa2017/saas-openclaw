@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>saas-openclaw - UX Design Directions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f0f2f5;
+            color: #1f1f1f;
+            line-height: 1.6;
+        }
+
+        /* 导航 */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            padding: 16px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1677FF;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            background: #e6e6e6;
+        }
+
+        .nav-tab.active {
+            background: #1677FF;
+            color: #fff;
+        }
+
+        /* 内容区 */
+        .content {
+            margin-top: 72px;
+            padding: 24px;
+        }
+
+        /* 设计方向 */
+        .direction {
+            display: none;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .direction.active {
+            display: block;
+        }
+
+        .direction-header {
+            padding: 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .direction-header h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .direction-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .direction-body {
+            padding: 24px;
+        }
+
+        /* 模拟界面 */
+        .mockup {
+            background: #f5f5f5;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e6e6e6;
+        }
+
+        /* 方向1: 标准企业风格 */
+        .layout-enterprise {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            padding: 16px 0;
+        }
+
+        .sidebar-logo {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0 24px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 24px;
+            color: rgba(255,255,255,0.65);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu li:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .sidebar-menu li.active {
+            color: #fff;
+            background: #1677FF;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 24px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1677FF;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #4096FF;
+        }
+
+        .btn-lg {
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #1f1f1f;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #1677FF;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(22,119,255,0.1);
+        }
+
+        /* 方向2: 向导式聚焦 */
+        .layout-wizard {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 48px;
+        }
+
+        .wizard-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+
+        .wizard-step {
+            display: flex;
+            align-items: center;
+        }
+
+        .wizard-step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .wizard-step.active .wizard-step-number {
+            background: #1677FF;
+            color: #fff;
+        }
+
+        .wizard-step.done .wizard-step-number {
+            background: #52C41A;
+            color: #fff;
+        }
+
+        .wizard-step-line {
+            width: 60px;
+            height: 2px;
+            background: #e6e6e6;
+            margin: 0 8px;
+        }
+
+        .wizard-step.done + .wizard-step .wizard-step-line {
+            background: #52C41A;
+        }
+
+        .wizard-content {
+            text-align: center;
+        }
+
+        .wizard-content h3 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .wizard-content p {
+            color: #666;
+            margin-bottom: 32px;
+        }
+
+        .wizard-form {
+            text-align: left;
+            background: #f9f9f9;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        /* 方向3: 卡片式仪表盘 */
+        .layout-dashboard {
+            padding: 24px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .stat-card-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-card-value {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .stat-card-change {
+            font-size: 12px;
+            color: #52C41A;
+            margin-top: 4px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+        }
+
+        .instance-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .instance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .instance-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .status-running {
+            background: #f6ffed;
+            color: #52C41A;
+        }
+
+        .status-pending {
+            background: #fff7e6;
+            color: #FAAD14;
+        }
+
+        .status-error {
+            background: #fff2f0;
+            color: #FF4D4F;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            height: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1677FF, #52C41A);
+            border-radius: 4px;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* 成功动画 */
+        .success-animation {
+            text-align: center;
+            padding: 48px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f6ffed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 40px;
+            animation: bounce 0.6s ease-out;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .success-desc {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        /* 评估指标 */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 16px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1677FF;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <h1>OpenClaw SaaS - 设计方向</h1>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showDirection(1)">方向 1: 标准企业</button>
+            <button class="nav-tab" onclick="showDirection(2)">方向 2: 向导聚焦</button>
+            <button class="nav-tab" onclick="showDirection(3)">方向 3: 仪表盘</button>
+        </div>
+    </nav>
+
+    <div class="content">
+        <!-- 方向1: 标准企业风格 -->
+        <div class="direction active" id="direction-1">
+            <div class="direction-header">
+                <h2>方向 1: 标准企业风格</h2>
+                <p>经典的左侧导航 + 主内容区布局，用户熟悉的飞书风格，适合日常操作场景</p>
+            </div>
+            <div class="direction-body">
+                <div class="mockup">
+                    <div class="layout-enterprise">
+                        <aside class="sidebar">
+                            <div class="sidebar-logo">OpenClaw</div>
+                            <ul class="sidebar-menu">
+                                <li class="active">概览</li>
+                                <li>我的实例</li>
+                                <li>配置管理</li>
+                                <li>使用教程</li>
+                            </ul>
+                        </aside>
+                        <main class="main-content">
+                            <div class="page-header">
+                                <h3>部署 OpenClaw 实例</h3>
+                                <p>配置飞书应用信息，一键启动您的 AI Agent</p>
+                            </div>
+                            <div class="card">
+                                <div class="card-title">飞书应用配置</div>
+                                <div class="form-group">
+                                    <label class="form-label">App ID</label>
+                                    <input type="text" class="form-input" placeholder="请输入飞书应用 App ID">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">App Secret</label>
+                                    <input type="text" class="form-input" placeholder="请输入飞书应用 App Secret">
+                                </div>
+                                <button class="btn btn-primary btn-lg">启动我的 OpenClaw</button>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value">中等</div>
+                        <div class="metric-label">信息密度</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">高</div>
+                        <div class="metric-label">用户熟悉度</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">标准</div>
+                        <div class="metric-label">开发复杂度</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 方向2: 向导式聚焦 -->
+        <div class="direction" id="direction-2">
+            <div class="direction-header">
+                <h2>方向 2: 向导式聚焦</h2>
+                <p>单列居中布局，分步引导用户完成部署，更专注、更少干扰的体验</p>
+            </div>
+            <div class="direction-body">
+                <div class="mockup">
+                    <div class="layout-wizard">
+                        <div class="wizard-steps">
+                            <div class="wizard-step done">
+                                <div class="wizard-step-number">1</div>
+                            </div>
+                            <div class="wizard-step-line"></div>
+                            <div class="wizard-step active">
+                                <div class="wizard-step-number">2</div>
+                            </div>
+                            <div class="wizard-step-line"></div>
+                            <div class="wizard-step">
+                                <div class="wizard-step-number">3</div>
+                            </div>
+                        </div>
+                        <div class="wizard-content">
+                            <h3>配置飞书应用</h3>
+                            <p>请前往飞书开放平台创建企业自建应用，获取 App ID 和 Secret</p>
+                            <div class="wizard-form">
+                                <div class="form-group">
+                                    <label class="form-label">App ID</label>
+                                    <input type="text" class="form-input" placeholder="cli_xxxxxxxxxxxx">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">App Secret</label>
+                                    <input type="text" class="form-input" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-lg">下一步：启动实例</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value">低</div>
+                        <div class="metric-label">信息密度</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">高</div>
+                        <div class="metric-label">引导清晰度</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">低</div>
+                        <div class="metric-label">认知负担</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 方向3: 卡片式仪表盘 -->
+        <div class="direction" id="direction-3">
+            <div class="direction-header">
+                <h2>方向 3: 卡片式仪表盘</h2>
+                <p>卡片组织信息，状态一目了然，现代 SaaS 风格，适合展示和管理多个实例</p>
+            </div>
+            <div class="direction-body">
+                <div class="mockup">
+                    <div class="layout-dashboard">
+                        <div class="dashboard-header">
+                            <div>
+                                <h3>我的 OpenClaw</h3>
+                                <p style="color: #666; font-size: 14px;">管理您的 AI Agent 实例</p>
+                            </div>
+                            <button class="btn btn-primary">+ 新建实例</button>
+                        </div>
+                        <div class="dashboard-stats">
+                            <div class="stat-card">
+                                <div class="stat-card-title">运行中</div>
+                                <div class="stat-card-value">1</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-title">总实例</div>
+                                <div class="stat-card-value">1</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-title">本月对话</div>
+                                <div class="stat-card-value">128</div>
+                                <div class="stat-card-change">+12%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-title">可用性</div>
+                                <div class="stat-card-value">99.9%</div>
+                            </div>
+                        </div>
+                        <div class="dashboard-grid">
+                            <div class="instance-card">
+                                <div class="instance-header">
+                                    <span class="instance-name">我的 AI Agent</span>
+                                    <span class="status-badge status-running">运行中</span>
+                                </div>
+                                <p style="color: #666; font-size: 14px; margin-bottom: 16px;">创建于 2026-03-04 · 运行 2 小时</p>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-primary">在飞书中打开</button>
+                                    <button class="btn" style="border: 1px solid #d9d9d9;">管理</button>
+                                </div>
+                            </div>
+                            <div class="instance-card">
+                                <div class="card-title">快速操作</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <button class="btn" style="justify-content: flex-start; background: #f5f5f5;">查看使用教程</button>
+                                    <button class="btn" style="justify-content: flex-start; background: #f5f5f5;">配置管理</button>
+                                    <button class="btn" style="justify-content: flex-start; background: #f5f5f5;">导出数据</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value">高</div>
+                        <div class="metric-label">信息密度</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">高</div>
+                        <div class="metric-label">状态可见性</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">中等</div>
+                        <div class="metric-label">开发复杂度</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDirection(num) {
+            // 隐藏所有方向
+            document.querySelectorAll('.direction').forEach(el => el.classList.remove('active'));
+            // 显示选中方向
+            document.getElementById('direction-' + num).classList.add('active');
+            // 更新标签状态
+            document.querySelectorAll('.nav-tab').forEach((el, i) => {
+                el.classList.toggle('active', i === num - 1);
+            });
+        }
+    </script>
+</body>
+</html>
