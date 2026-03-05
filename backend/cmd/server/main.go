@@ -71,7 +71,7 @@ func main() {
 	})
 
 	// Database health check endpoint
-	healthHandler := health.NewHandler(db, &cfg.Database)
+	healthHandler := health.NewHandler(db, &cfg.Database, logger)
 	router.GET("/health/database", healthHandler.Database)
 
 	// API v1 routes

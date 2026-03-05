@@ -19,6 +19,9 @@ func TestLoad(t *testing.T) {
 	os.Setenv("DB_MAX_IDLE_CONNS", "15")
 	os.Setenv("DB_CONN_MAX_LIFETIME", "1h")
 	os.Setenv("DB_CONN_MAX_IDLE_TIME", "30m")
+	os.Setenv("DB_SSL_ROOT_CERT", "/path/to/root.crt")
+	os.Setenv("DB_SSL_CERT", "/path/to/client.crt")
+	os.Setenv("DB_SSL_KEY", "/path/to/client.key")
 	os.Setenv("LOG_LEVEL", "debug")
 
 	defer func() {
@@ -33,6 +36,9 @@ func TestLoad(t *testing.T) {
 		os.Unsetenv("DB_MAX_IDLE_CONNS")
 		os.Unsetenv("DB_CONN_MAX_LIFETIME")
 		os.Unsetenv("DB_CONN_MAX_IDLE_TIME")
+		os.Unsetenv("DB_SSL_ROOT_CERT")
+		os.Unsetenv("DB_SSL_CERT")
+		os.Unsetenv("DB_SSL_KEY")
 		os.Unsetenv("LOG_LEVEL")
 	}()
 
@@ -73,6 +79,18 @@ func TestLoad(t *testing.T) {
 		t.Errorf("Database.ConnMaxIdleTime = %v, want 30m", cfg.Database.ConnMaxIdleTime)
 	}
 
+	if cfg.Database.SSLRootCert != "/path/to/root.crt" {
+		t.Errorf("Database.SSLRootCert = %v, want /path/to/root.crt", cfg.Database.SSLRootCert)
+	}
+
+	if cfg.Database.SSLCert != "/path/to/client.crt" {
+		t.Errorf("Database.SSLCert = %v, want /path/to/client.crt", cfg.Database.SSLCert)
+	}
+
+	if cfg.Database.SSLKey != "/path/to/client.key" {
+		t.Errorf("Database.SSLKey = %v, want /path/to/client.key", cfg.Database.SSLKey)
+	}
+
 	if cfg.Log.Level != "debug" {
 		t.Errorf("Log.Level = %v, want debug", cfg.Log.Level)
 	}
@@ -90,6 +108,9 @@ func TestLoadDefaults(t *testing.T) {
 	os.Unsetenv("DB_MAX_IDLE_CONNS")
 	os.Unsetenv("DB_CONN_MAX_LIFETIME")
 	os.Unsetenv("DB_CONN_MAX_IDLE_TIME")
+	os.Unsetenv("DB_SSL_ROOT_CERT")
+	os.Unsetenv("DB_SSL_CERT")
+	os.Unsetenv("DB_SSL_KEY")
 	os.Unsetenv("LOG_LEVEL")
 
 	cfg, err := Load()
@@ -127,5 +148,189 @@ func TestLoadDefaults(t *testing.T) {
 
 	if cfg.Log.Level != "info" {
 		t.Errorf("Log.Level default = %v, want info", cfg.Log.Level)
+	}
+
+	// SSL cert defaults should be empty
+	if cfg.Database.SSLRootCert != "" {
+		t.Errorf("Database.SSLRootCert default = %v, want empty", cfg.Database.SSLRootCert)
+	}
+	if cfg.Database.SSLCert != "" {
+		t.Errorf("Database.SSLCert default = %v, want empty", cfg.Database.SSLCert)
+	}
+	if cfg.Database.SSLKey != "" {
+		t.Errorf("Database.SSLKey default = %v, want empty", cfg.Database.SSLKey)
+	}
+}
+
+func TestDatabaseConfigValidate(t *testing.T) {
+	tests := []struct {
+		name        string
+		cfg         *DatabaseConfig
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name: "valid config",
+			cfg: &DatabaseConfig{
+				Host:         "localhost",
+				Port:         5432,
+				User:         "postgres",
+				Name:         "testdb",
+				SSLMode:      "disable",
+				MaxOpenConns: 100,
+				MaxIdleConns: 10,
+			},
+			expectError: false,
+		},
+		{
+			name: "empty host",
+			cfg: &DatabaseConfig{
+				Host: "",
+				Port: 5432,
+				User: "postgres",
+				Name: "testdb",
+			},
+			expectError: true,
+			errorMsg:    "database host is required",
+		},
+		{
+			name: "invalid port - negative",
+			cfg: &DatabaseConfig{
+				Host: "localhost",
+				Port: -1,
+				User: "postgres",
+				Name: "testdb",
+			},
+			expectError: true,
+			errorMsg:    "database port must be between 1 and 65535",
+		},
+		{
+			name: "invalid port - too high",
+			cfg: &DatabaseConfig{
+				Host: "localhost",
+				Port: 70000,
+				User: "postgres",
+				Name: "testdb",
+			},
+			expectError: true,
+			errorMsg:    "database port must be between 1 and 65535",
+		},
+		{
+			name: "empty user",
+			cfg: &DatabaseConfig{
+				Host: "localhost",
+				Port: 5432,
+				User: "",
+				Name: "testdb",
+			},
+			expectError: true,
+			errorMsg:    "database user is required",
+		},
+		{
+			name: "empty name",
+			cfg: &DatabaseConfig{
+				Host: "localhost",
+				Port: 5432,
+				User: "postgres",
+				Name: "",
+			},
+			expectError: true,
+			errorMsg:    "database name is required",
+		},
+		{
+			name: "negative max open conns",
+			cfg: &DatabaseConfig{
+				Host:         "localhost",
+				Port:         5432,
+				User:         "postgres",
+				Name:         "testdb",
+				MaxOpenConns: -1,
+			},
+			expectError: true,
+			errorMsg:    "max open connections cannot be negative",
+		},
+		{
+			name: "negative max idle conns",
+			cfg: &DatabaseConfig{
+				Host:         "localhost",
+				Port:         5432,
+				User:         "postgres",
+				Name:         "testdb",
+				MaxIdleConns: -1,
+			},
+			expectError: true,
+			errorMsg:    "max idle connections cannot be negative",
+		},
+		{
+			name: "invalid SSL mode",
+			cfg: &DatabaseConfig{
+				Host:    "localhost",
+				Port:    5432,
+				User:    "postgres",
+				Name:    "testdb",
+				SSLMode: "invalid",
+			},
+			expectError: true,
+			errorMsg:    "invalid SSL mode",
+		},
+		{
+			name: "valid SSL modes",
+			cfg: &DatabaseConfig{
+				Host:    "localhost",
+				Port:    5432,
+				User:    "postgres",
+				Name:    "testdb",
+				SSLMode: "verify-full",
+			},
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.cfg.Validate()
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("expected error containing %q, got nil", tt.errorMsg)
+				} else if tt.errorMsg != "" && len(err.Error()) >= len(tt.errorMsg) && err.Error()[:len(tt.errorMsg)] != tt.errorMsg {
+					t.Errorf("error = %q, want to contain %q", err.Error(), tt.errorMsg)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
+func TestConfigValidate(t *testing.T) {
+	// Test that Config.Validate delegates to DatabaseConfig.Validate
+	cfg := &Config{
+		Database: DatabaseConfig{
+			Host: "", // Invalid
+			Port: 5432,
+			User: "postgres",
+			Name: "testdb",
+		},
+	}
+
+	err := cfg.Validate()
+	if err == nil {
+		t.Error("expected error for empty host")
+	}
+
+	// Valid config should not error
+	cfg2 := &Config{
+		Database: DatabaseConfig{
+			Host: "localhost",
+			Port: 5432,
+			User: "postgres",
+			Name: "testdb",
+		},
+	}
+
+	if err := cfg2.Validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
 	}
 }

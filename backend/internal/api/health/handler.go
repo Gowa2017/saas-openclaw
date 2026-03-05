@@ -7,19 +7,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 
 	"github.com/gowa/saas-openclaw/backend/internal/infrastructure/config"
 )
 
 // Handler handles health check requests
 type Handler struct {
-	db  *sqlx.DB
-	cfg *config.DatabaseConfig
+	db     *sqlx.DB
+	cfg    *config.DatabaseConfig
+	logger *zap.Logger
 }
 
 // NewHandler creates a new health handler
-func NewHandler(db *sqlx.DB, cfg *config.DatabaseConfig) *Handler {
-	return &Handler{db: db, cfg: cfg}
+func NewHandler(db *sqlx.DB, cfg *config.DatabaseConfig, logger *zap.Logger) *Handler {
+	return &Handler{db: db, cfg: cfg, logger: logger}
 }
 
 // PoolStats represents database connection pool statistics
@@ -72,8 +74,11 @@ func (h *Handler) Database(c *gin.Context) {
 			connected = true
 			// Query PostgreSQL version
 			row := h.db.QueryRow("SELECT version()")
-			if err := row.Scan(&version); err != nil {
+			if scanErr := row.Scan(&version); scanErr != nil {
 				version = "unknown"
+				if h.logger != nil {
+					h.logger.Warn("failed to query database version", zap.Error(scanErr))
+				}
 			}
 			stats = h.db.Stats()
 		}

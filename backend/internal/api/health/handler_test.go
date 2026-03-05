@@ -7,11 +7,18 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"github.com/gowa/saas-openclaw/backend/internal/infrastructure/config"
 )
 
 func init() {
 	gin.SetMode(gin.TestMode)
+}
+
+// getTestLogger returns a nop logger for testing
+func getTestLogger() *zap.Logger {
+	return zap.NewNop()
 }
 
 // TestDatabaseHealthHandler tests the database health endpoint
@@ -44,8 +51,8 @@ func TestDatabaseHealthHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create handler
-			handler := NewHandler(nil, cfg)
+			// Create handler with nop logger
+			handler := NewHandler(nil, cfg, getTestLogger())
 
 			// Create test router
 			router := gin.New()
@@ -80,8 +87,6 @@ func TestDatabaseHealthHandler(t *testing.T) {
 			}
 
 			// Without DB connection, the pool stats come from config (MaxIdle)
-			// MaxOpen comes from stats.MaxOpenConnections which is 0 when no DB
-			// So we only verify MaxIdle comes from config
 			if response.Data.Database.PoolStats.MaxIdle != cfg.MaxIdleConns {
 				t.Errorf("MaxIdle = %v, want %v", response.Data.Database.PoolStats.MaxIdle, cfg.MaxIdleConns)
 			}
@@ -106,7 +111,7 @@ func TestHealthResponseStructure(t *testing.T) {
 		MaxIdleConns: 10,
 	}
 
-	handler := NewHandler(nil, cfg)
+	handler := NewHandler(nil, cfg, getTestLogger())
 
 	router := gin.New()
 	router.GET("/health/database", handler.Database)
@@ -185,7 +190,8 @@ func TestNewHandler(t *testing.T) {
 		MaxIdleConns: 10,
 	}
 
-	handler := NewHandler(nil, cfg)
+	logger := getTestLogger()
+	handler := NewHandler(nil, cfg, logger)
 	if handler == nil {
 		t.Fatal("NewHandler returned nil")
 	}
@@ -197,11 +203,15 @@ func TestNewHandler(t *testing.T) {
 	if handler.db != nil {
 		t.Error("handler db should be nil when nil is passed")
 	}
+
+	if handler.logger != logger {
+		t.Error("handler logger not set correctly")
+	}
 }
 
 // TestHandlerWithNilConfig tests handler behavior with nil config
 func TestHandlerWithNilConfig(t *testing.T) {
-	handler := NewHandler(nil, nil)
+	handler := NewHandler(nil, nil, getTestLogger())
 	if handler == nil {
 		t.Fatal("NewHandler should not return nil even with nil config")
 	}
@@ -213,6 +223,32 @@ func TestHandlerWithNilConfig(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// Should not panic
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("status code = %v, want %v", w.Code, http.StatusServiceUnavailable)
+	}
+}
+
+// TestHandlerWithNilLogger tests that handler works with nil logger
+func TestHandlerWithNilLogger(t *testing.T) {
+	cfg := &config.DatabaseConfig{
+		MaxOpenConns: 100,
+		MaxIdleConns: 10,
+	}
+
+	handler := NewHandler(nil, cfg, nil)
+	if handler == nil {
+		t.Fatal("NewHandler should not return nil")
+	}
+
+	router := gin.New()
+	router.GET("/health/database", handler.Database)
+
+	req, _ := http.NewRequest("GET", "/health/database", nil)
+	w := httptest.NewRecorder()
+
+	// Should not panic even with nil logger
 	router.ServeHTTP(w, req)
 
 	if w.Code != http.StatusServiceUnavailable {
