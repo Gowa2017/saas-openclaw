@@ -1,0 +1,126 @@
+# Docker Compose 本地开发环境配置
+# Story 1.5: Docker 容器化配置
+# 用途: 本地开发和测试环境
+# 使用方法: 复制 .env.example 为 .env 并修改配置
+
+services:
+  # ============================================
+  # PostgreSQL 数据库服务
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: openclaw-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # 性能优化配置
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openclaw} -d ${POSTGRES_DB:-openclaw}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend-network
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # ============================================
+  # 后端 API 服务
+  # ============================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: openclaw-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # 覆盖/补充配置
+      - SERVER_PORT=8080
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - backend-network
+      - frontend-network
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # ============================================
+  # 前端 Web 服务
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: openclaw-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - frontend-network
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+# ============================================
+# 数据卷定义
+# ============================================
+volumes:
+  postgres_data:
+    driver: local
+    name: openclaw_postgres_data
+
+# ============================================
+# 网络定义
+# ============================================
+networks:
+  # 后端网络: 后端与数据库通信
+  backend-network:
+    driver: bridge
+    name: openclaw-backend
+  # 前端网络: 前端与后端通信
+  frontend-network:
+    driver: bridge
+    name: openclaw-frontend

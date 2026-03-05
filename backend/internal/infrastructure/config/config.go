@@ -69,6 +69,18 @@ func Load() (*Config, error) {
 	// Read from environment variables
 	viper.AutomaticEnv()
 
+	// Explicitly bind environment variables (required for AutomaticEnv to work correctly)
+	// Note: BindEnv errors are rare (only for empty key names), so we ignore them
+	envVars := []string{
+		"SERVER_PORT", "DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD",
+		"DB_NAME", "DB_SSLMODE", "DB_MAX_OPEN_CONNS", "DB_MAX_IDLE_CONNS",
+		"DB_CONN_MAX_LIFETIME", "DB_CONN_MAX_IDLE_TIME",
+		"DB_SSL_ROOT_CERT", "DB_SSL_CERT", "DB_SSL_KEY", "LOG_LEVEL",
+	}
+	for _, env := range envVars {
+		_ = viper.BindEnv(env)
+	}
+
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			return nil, fmt.Errorf("error reading config file: %w", err)
