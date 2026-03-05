@@ -1,15 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-export interface Instance {
-  id: string
-  tenantId: string
-  name: string
-  status: 'running' | 'stopped' | 'error' | 'pending'
-  url?: string
-  createdAt: string
-  updatedAt: string
-}
+import type { Instance } from '@/types/models'
 
 export const useInstanceStore = defineStore('instance', () => {
   const instances = ref<Instance[]>([])

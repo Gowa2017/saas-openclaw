@@ -1,12 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-export interface FeishuConfig {
-  appId: string
-  appSecret: string
-  encryptKey?: string
-  verificationToken?: string
-}
+import type { FeishuConfig } from '@/types/models'
 
 export const useConfigStore = defineStore('config', () => {
   const feishuConfig = ref<FeishuConfig | null>(null)

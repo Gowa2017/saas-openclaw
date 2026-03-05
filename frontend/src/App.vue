@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { NConfigProvider, NLayout, NLayoutHeader, NLayoutSider, NLayoutContent, NMenu, NMessageProvider } from 'naive-ui'
-import { useRouter } from 'vue-router'
 import type { MenuOption } from 'naive-ui'
+import { useAuthStore } from '@/stores/auth'
 
+const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
+
+// 判断是否显示布局（登录页不显示）
+const showLayout = computed(() => route.path !== '/login')
 
 const menuOptions: MenuOption[] = [
   {
@@ -42,12 +49,21 @@ const menuOptions: MenuOption[] = [
     onClick: () => router.push('/onboarding'),
   },
 ]
+
+function handleLogout() {
+  authStore.logout()
+  router.push('/login')
+}
 </script>
 
 <template>
   <n-config-provider>
     <n-message-provider>
-      <n-layout has-sider class="app-layout">
+      <!-- 登录页：无布局 -->
+      <router-view v-if="!showLayout" />
+
+      <!-- 其他页面：带侧边栏布局 -->
+      <n-layout v-else has-sider class="app-layout">
         <n-layout-sider
           bordered
           collapse-mode="width"
@@ -63,7 +79,7 @@ const menuOptions: MenuOption[] = [
         </n-layout-sider>
         <n-layout>
           <n-layout-header bordered class="app-header">
-            <n-button text @click="router.push('/login')">退出登录</n-button>
+            <n-button text @click="handleLogout">退出登录</n-button>
           </n-layout-header>
           <n-layout-content class="app-content">
             <router-view />

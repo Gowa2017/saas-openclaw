@@ -1,13 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-export interface Tenant {
-  id: string
-  name: string
-  feishuAppId?: string
-  createdAt: string
-  updatedAt: string
-}
+import type { Tenant } from '@/types/models'
 
 export const useTenantStore = defineStore('tenant', () => {
   const currentTenant = ref<Tenant | null>(null)
