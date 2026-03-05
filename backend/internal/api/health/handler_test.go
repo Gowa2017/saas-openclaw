@@ -177,3 +177,152 @@ func TestHealthResponseStructure(t *testing.T) {
 		t.Error("missing meta.timestamp field")
 	}
 }
+
+// TestNewHandler tests the NewHandler constructor
+func TestNewHandler(t *testing.T) {
+	cfg := &config.DatabaseConfig{
+		MaxOpenConns: 100,
+		MaxIdleConns: 10,
+	}
+
+	handler := NewHandler(nil, cfg)
+	if handler == nil {
+		t.Fatal("NewHandler returned nil")
+	}
+
+	if handler.cfg != cfg {
+		t.Error("handler config not set correctly")
+	}
+
+	if handler.db != nil {
+		t.Error("handler db should be nil when nil is passed")
+	}
+}
+
+// TestHandlerWithNilConfig tests handler behavior with nil config
+func TestHandlerWithNilConfig(t *testing.T) {
+	handler := NewHandler(nil, nil)
+	if handler == nil {
+		t.Fatal("NewHandler should not return nil even with nil config")
+	}
+
+	router := gin.New()
+	router.GET("/health/database", handler.Database)
+
+	req, _ := http.NewRequest("GET", "/health/database", nil)
+	w := httptest.NewRecorder()
+
+	// Should not panic
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("status code = %v, want %v", w.Code, http.StatusServiceUnavailable)
+	}
+}
+
+// TestPoolStatsStructure tests PoolStats struct
+func TestPoolStatsStructure(t *testing.T) {
+	stats := PoolStats{
+		OpenConnections: 10,
+		InUse:           5,
+		Idle:            5,
+		MaxOpen:         100,
+		MaxIdle:         10,
+	}
+
+	if stats.OpenConnections != 10 {
+		t.Errorf("OpenConnections = %v, want 10", stats.OpenConnections)
+	}
+	if stats.InUse != 5 {
+		t.Errorf("InUse = %v, want 5", stats.InUse)
+	}
+	if stats.Idle != 5 {
+		t.Errorf("Idle = %v, want 5", stats.Idle)
+	}
+}
+
+// TestDatabaseHealthStructure tests DatabaseHealth struct
+func TestDatabaseHealthStructure(t *testing.T) {
+	health := DatabaseHealth{
+		Connected: true,
+		Version:   "PostgreSQL 15.0",
+		PoolStats: PoolStats{
+			OpenConnections: 10,
+			InUse:           5,
+			Idle:            5,
+			MaxOpen:         100,
+			MaxIdle:         10,
+		},
+	}
+
+	if !health.Connected {
+		t.Error("Connected should be true")
+	}
+	if health.Version != "PostgreSQL 15.0" {
+		t.Errorf("Version = %v, want PostgreSQL 15.0", health.Version)
+	}
+}
+
+// TestHealthDataStructure tests HealthData struct
+func TestHealthDataStructure(t *testing.T) {
+	data := HealthData{
+		Status: "healthy",
+		Database: DatabaseHealth{
+			Connected: true,
+			Version:   "PostgreSQL 15.0",
+		},
+	}
+
+	if data.Status != "healthy" {
+		t.Errorf("Status = %v, want healthy", data.Status)
+	}
+}
+
+// TestMetaStructure tests Meta struct
+func TestMetaStructure(t *testing.T) {
+	meta := Meta{
+		Timestamp: "2024-01-01T00:00:00Z",
+	}
+
+	if meta.Timestamp != "2024-01-01T00:00:00Z" {
+		t.Errorf("Timestamp = %v, want 2024-01-01T00:00:00Z", meta.Timestamp)
+	}
+}
+
+// TestResponseStructure tests Response struct
+func TestResponseStructure(t *testing.T) {
+	errMsg := "test error"
+	response := Response{
+		Data: HealthData{
+			Status: "healthy",
+		},
+		Error: &errMsg,
+		Meta: Meta{
+			Timestamp: "2024-01-01T00:00:00Z",
+		},
+	}
+
+	if response.Data.Status != "healthy" {
+		t.Errorf("Data.Status = %v, want healthy", response.Data.Status)
+	}
+	if response.Error == nil || *response.Error != "test error" {
+		t.Error("Error not set correctly")
+	}
+}
+
+// TestResponseWithNilError tests Response with nil error
+func TestResponseWithNilError(t *testing.T) {
+	response := Response{
+		Data: HealthData{
+			Status: "healthy",
+		},
+		Error: nil,
+		Meta: Meta{
+			Timestamp: "2024-01-01T00:00:00Z",
+		},
+	}
+
+	if response.Error != nil {
+		t.Error("Error should be nil")
+	}
+}

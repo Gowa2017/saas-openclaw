@@ -91,6 +91,12 @@ func (h *Handler) Database(c *gin.Context) {
 		errorMsg = &msg
 	}
 
+	// Get MaxIdleConns from config, default to 0 if config is nil
+	maxIdleConns := 0
+	if h.cfg != nil {
+		maxIdleConns = h.cfg.MaxIdleConns
+	}
+
 	// Build response
 	response := Response{
 		Data: HealthData{
@@ -103,7 +109,7 @@ func (h *Handler) Database(c *gin.Context) {
 					InUse:           stats.InUse,
 					Idle:            stats.Idle,
 					MaxOpen:         stats.MaxOpenConnections,
-					MaxIdle:         h.cfg.MaxIdleConns,
+					MaxIdle:         maxIdleConns,
 				},
 			},
 		},
