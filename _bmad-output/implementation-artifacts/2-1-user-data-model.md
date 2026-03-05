@@ -1,6 +1,6 @@
 # Story 2.1: 用户数据模型与数据库表
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -49,37 +49,39 @@ so that 系统可以存储和管理用户信息。
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: 创建租户表 (AC: 1)
-  - [ ] 1.1 创建 `internal/domain/tenant/tenant.go` 定义 Tenant 结构体
-  - [ ] 1.2 创建数据库迁移脚本 `migrations/001_create_tenants.up.sql`
-  - [ ] 1.3 创建回滚脚本 `migrations/001_create_tenants.down.sql`
+- [x] Task 1: 创建租户表 (AC: 1)
+  - [x] 1.1 创建 `internal/domain/tenant/tenant.go` 定义 Tenant 结构体
+  - [x] 1.2 创建数据库迁移脚本 `migrations/000001_create_tenants.up.sql`
+  - [x] 1.3 创建回滚脚本 `migrations/000001_create_tenants.down.sql`
 
-- [ ] Task 2: 创建用户领域模型 (AC: 4)
-  - [ ] 2.1 创建 `internal/domain/user/tenant_user.go` 定义 TenantUser 结构体
-  - [ ] 2.2 创建 `internal/domain/user/admin_user.go` 定义 AdminUser 结构体
-  - [ ] 2.3 定义用户角色枚举 (RoleTenantUser, RoleTenantAdmin)
-  - [ ] 2.4 添加 `json` 和 `db` 结构体标签
+- [x] Task 2: 创建用户领域模型 (AC: 4)
+  - [x] 2.1 创建 `internal/domain/user/tenant_user.go` 定义 TenantUser 结构体
+  - [x] 2.2 创建 `internal/domain/user/admin_user.go` 定义 AdminUser 结构体
+  - [x] 2.3 定义用户角色枚举 (RoleTenantUser, RoleTenantAdmin)
+  - [x] 2.4 添加 `json` 和 `db` 结构体标签
 
-- [ ] Task 3: 创建数据库迁移脚本 (AC: 1, 2, 3)
-  - [ ] 3.1 创建 `migrations/002_create_tenant_users.up.sql`
-  - [ ] 3.2 创建 `migrations/002_create_tenant_users.down.sql`
-  - [ ] 3.3 创建 `migrations/003_create_admin_users.up.sql`
-  - [ ] 3.4 创建 `migrations/003_create_admin_users.down.sql`
-  - [ ] 3.5 添加索引定义
+- [x] Task 3: 创建数据库迁移脚本 (AC: 1, 2, 3)
+  - [x] 3.1 创建 `migrations/000002_create_tenant_users.up.sql`
+  - [x] 3.2 创建 `migrations/000002_create_tenant_users.down.sql`
+  - [x] 3.3 创建 `migrations/000003_create_admin_users.up.sql`
+  - [x] 3.4 创建 `migrations/000003_create_admin_users.down.sql`
+  - [x] 3.5 添加索引定义
 
-- [ ] Task 4: 实现 Repository 层 (AC: 5)
-  - [ ] 4.1 创建 `internal/repository/tenant_user.go`
-  - [ ] 4.2 创建 `internal/repository/admin_user.go`
-  - [ ] 4.3 实现创建用户方法
-  - [ ] 4.4 实现查询用户方法 (ByID, ByEmail, ByTenantID)
-  - [ ] 4.5 实现更新用户方法
-  - [ ] 4.6 实现删除用户方法
+- [x] Task 4: 实现 Repository 层 (AC: 5)
+  - [x] 4.1 创建 `internal/repository/tenant.go`
+  - [x] 4.2 创建 `internal/repository/tenant_user.go`
+  - [x] 4.3 创建 `internal/repository/admin_user.go`
+  - [x] 4.4 实现创建用户方法
+  - [x] 4.5 实现查询用户方法 (ByID, ByEmail, ByTenantID)
+  - [x] 4.6 实现更新用户方法
+  - [x] 4.7 实现删除用户方法
 
-- [ ] Task 5: 编写单元测试 (AC: 1-5)
-  - [ ] 5.1 编写 `tenant_user_test.go` 测试领域模型
-  - [ ] 5.2 编写 `admin_user_test.go` 测试领域模型
-  - [ ] 5.3 编写 `tenant_user_repository_test.go` 测试 Repository
-  - [ ] 5.4 编写 `admin_user_repository_test.go` 测试 Repository
+- [x] Task 5: 编写单元测试 (AC: 1-5)
+  - [x] 5.1 编写 `tenant_test.go` 测试租户领域模型
+  - [x] 5.2 编写 `tenant_user_test.go` 测试领域模型
+  - [x] 5.3 编写 `admin_user_test.go` 测试领域模型
+  - [x] 5.4 编写 `tenant_user_repository_test.go` 测试 Repository
+  - [x] 5.5 编写 `admin_user_repository_test.go` 测试 Repository
 
 ## Dev Notes
 
@@ -414,10 +416,108 @@ backend/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+qianfan-code-latest
 
 ### Debug Log References
 
+无错误日志
+
 ### Completion Notes List
 
+**2026-03-05 - 实现完成**
+
+1. **领域模型层**:
+   - 创建 Tenant 结构体，包含 ID、Name、Status、CreatedAt、UpdatedAt 字段
+   - 创建 TenantUser 结构体，支持租户用户管理
+   - 创建 AdminUser 结构体，支持平台管理员管理
+   - 定义角色枚举 Role (user, admin) 和 AdminRole (admin, super_admin)
+   - 所有结构体使用 `json` 和 `db` 标签
+
+2. **数据库迁移**:
+   - 创建 000001_create_tenants 迁移（包含 status 和 name 索引）
+   - 创建 000002_create_tenant_users 迁移（包含 TenantID 和 Email 索引）
+   - 创建 000003_create_admin_users 迁移（包含 Username 和 Email 唯一索引）
+   - 所有迁移使用 PascalCase 列名和 snake_case 表名
+
+3. **Repository 层**:
+   - 实现 TenantRepository（Create, GetByID, GetByName, List, Update, Delete）
+   - 实现 TenantUserRepository（Create, GetByID, GetByEmail, GetByTenantID, Update, Delete）
+   - 实现 AdminUserRepository（Create, GetByID, GetByUsername, GetByEmail, List, Update, UpdatePassword, VerifyPassword, Delete）
+   - AdminUserRepository 内置 bcrypt 密码哈希支持
+
+4. **测试覆盖**:
+   - 领域模型单元测试全部通过
+   - Repository 单元测试通过（集成测试使用 -short 跳过）
+   - 所有代码通过 go vet 检查
+
+5. **依赖添加**:
+   - github.com/google/uuid v1.6.0
+
+**2026-03-05 - 代码审查修复**
+
+修复了 6 个问题（2 HIGH, 4 MEDIUM）:
+
+1. **[HIGH] 输入验证** - 为所有领域模型添加 Validate() 方法
+   - Tenant: 验证 Name 必填，Status 有效
+   - TenantUser: 验证 TenantID、Name、Email 必填，Role 有效
+   - AdminUser: 验证 Username、Name、Email 必填，Role 有效
+   - Repository 层在 Create/Update 前调用 Validate()
+
+2. **[HIGH] 密码验证** - AdminUserRepository.Create 现在验证 password 非空
+
+3. **[MEDIUM] 错误处理改进**:
+   - 创建 `internal/repository/errors.go` 定义标准错误类型
+   - ErrNotFound, ErrValidation, ErrDuplicateKey
+   - IsNotFoundError() 辅助函数
+
+4. **[MEDIUM] Update 错误区分** - 现在正确返回 ErrNotFound 当 ID 不存在
+
+5. **[MEDIUM] Status 验证** - 添加 Status.IsValid() 方法
+
+6. **[MEDIUM] 分页支持** - List 方法添加 limit/offset 参数
+
+### Senior Developer Review (AI)
+
+**Review Date:** 2026-03-05
+**Reviewer Model:** qianfan-code-latest
+**Outcome:** ✅ Approved (after fixes)
+
+#### Action Items
+
+- [x] [HIGH] 添加输入验证 - 所有领域模型 Validate() 方法
+- [x] [HIGH] 添加密码验证 - AdminUserRepository.Create password 非空检查
+- [x] [MEDIUM] 创建自定义错误类型 - errors.go
+- [x] [MEDIUM] 改进 Update 错误处理 - 返回 ErrNotFound
+- [x] [MEDIUM] 添加 Status.IsValid() 方法
+- [x] [MEDIUM] 添加分页支持 - List 方法 limit/offset
+
+#### Review Summary
+
+代码质量良好，架构遵循 Clean Architecture 原则。发现的问题已全部修复。
+
 ### File List
+
+**新增文件:**
+- backend/internal/domain/tenant/tenant.go
+- backend/internal/domain/tenant/tenant_test.go
+- backend/internal/domain/user/role.go
+- backend/internal/domain/user/tenant_user.go
+- backend/internal/domain/user/admin_user.go
+- backend/internal/domain/user/tenant_user_test.go
+- backend/internal/domain/user/admin_user_test.go
+- backend/internal/repository/errors.go
+- backend/internal/repository/tenant.go
+- backend/internal/repository/tenant_user.go
+- backend/internal/repository/admin_user.go
+- backend/internal/repository/tenant_user_repository_test.go
+- backend/internal/repository/admin_user_repository_test.go
+- backend/migrations/000001_create_tenants.up.sql
+- backend/migrations/000001_create_tenants.down.sql
+- backend/migrations/000002_create_tenant_users.up.sql
+- backend/migrations/000002_create_tenant_users.down.sql
+- backend/migrations/000003_create_admin_users.up.sql
+- backend/migrations/000003_create_admin_users.down.sql
+
+**修改文件:**
+- backend/go.mod (添加 github.com/google/uuid 依赖)
+- backend/go.sum (依赖更新)
