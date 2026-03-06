@@ -54,7 +54,7 @@ development_status:
   2-1-user-data-model: done
   2-2-jwt-token-middleware: done
   2-3-user-info-tenant-identify: done
-  2-4-admin-auth-system: ready-for-dev
+  2-4-admin-auth-system: done
   2-5-frontend-login-page: ready-for-dev
   2-6-admin-login-page: ready-for-dev
   epic-2-retrospective: optional

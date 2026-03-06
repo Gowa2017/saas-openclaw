@@ -1,6 +1,6 @@
 # Story 2.4: 平台管理员独立认证系统
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -38,39 +38,39 @@ so that 可以与普通用户认证体系分离。
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: 创建管理员认证服务 (AC: 1, 2, 3)
-  - [ ] 1.1 创建 `internal/service/admin_auth.go`
-  - [ ] 1.2 实现 Login 方法（验证密码）
-  - [ ] 1.3 实现 GenerateToken 方法
-  - [ ] 1.4 实现登录失败日志记录
+- [x] Task 1: 创建管理员认证服务 (AC: 1, 2, 3)
+  - [x] 1.1 创建 `internal/service/admin_auth.go`
+  - [x] 1.2 实现 Login 方法（验证密码）
+  - [x] 1.3 实现 GenerateToken 方法
+  - [x] 1.4 实现登录失败日志记录
 
-- [ ] Task 2: 创建管理员认证 API (AC: 1, 2, 3)
-  - [ ] 2.1 创建 `internal/api/admin/auth_handler.go`
-  - [ ] 2.2 实现 POST /v1/admin/auth/login 端点
-  - [ ] 2.3 实现请求参数验证
-  - [ ] 2.4 实现响应格式化
+- [x] Task 2: 创建管理员认证 API (AC: 1, 2, 3)
+  - [x] 2.1 创建 `internal/api/admin/auth_handler.go`
+  - [x] 2.2 实现 POST /v1/admin/auth/login 端点
+  - [x] 2.3 实现请求参数验证
+  - [x] 2.4 实现响应格式化
 
-- [ ] Task 3: 创建管理员中间件 (AC: 2)
-  - [ ] 3.1 创建 `pkg/middleware/admin_auth.go`
-  - [ ] 3.2 实现管理员 Token 验证
-  - [ ] 3.3 实现角色权限检查
-  - [ ] 3.4 实现管理员上下文注入
+- [x] Task 3: 创建管理员中间件 (AC: 2)
+  - [x] 3.1 创建 `pkg/middleware/admin_auth.go`
+  - [x] 3.2 实现管理员 Token 验证
+  - [x] 3.3 实现角色权限检查
+  - [x] 3.4 实现管理员上下文注入
 
-- [ ] Task 4: 创建管理员 CLI 命令 (AC: 4)
-  - [ ] 4.1 创建 `cmd/admin/main.go`
-  - [ ] 4.2 实现 create-admin 命令
-  - [ ] 4.3 实现密码输入（隐藏显示）
-  - [ ] 4.4 实现密码加密存储
+- [x] Task 4: 创建管理员 CLI 命令 (AC: 4)
+  - [x] 4.1 创建 `cmd/admin/main.go`
+  - [x] 4.2 实现 create-admin 命令
+  - [x] 4.3 实现密码输入（隐藏显示）
+  - [x] 4.4 实现密码加密存储
 
-- [ ] Task 5: 更新 Repository (AC: 1)
-  - [ ] 5.1 在 `AdminUserRepository` 添加 GetByUsername 方法
-  - [ ] 5.2 实现密码验证方法
+- [x] Task 5: 更新 Repository (AC: 1)
+  - [x] 5.1 在 `AdminUserRepository` 添加 GetByUsername 方法 (已存在)
+  - [x] 5.2 实现密码验证方法 (已存在)
 
-- [ ] Task 6: 编写单元测试 (AC: 1-4)
-  - [ ] 6.1 编写 `admin_auth_test.go` 测试认证服务
-  - [ ] 6.2 编写 `auth_handler_test.go` 测试 API
-  - [ ] 6.3 编写 `admin_auth_middleware_test.go` 测试中间件
-  - [ ] 6.4 编写 `admin_cli_test.go` 测试 CLI 命令
+- [x] Task 6: 编写单元测试 (AC: 1-4)
+  - [x] 6.1 编写 `admin_auth_test.go` 测试认证服务
+  - [x] 6.2 编写 `auth_handler_test.go` 测试 API
+  - [x] 6.3 编写 `admin_auth_middleware_test.go` 测试中间件
+  - [x] 6.4 编写 `admin_cli_test.go` 测试 CLI 命令
 
 ## Dev Notes
 
@@ -543,8 +543,47 @@ ADMIN_TOKEN_EXPIRATION=24h
 
 ### Agent Model Used
 
+qianfan-code-latest (Claude Code)
+
 ### Debug Log References
+
+无错误或问题需要记录
 
 ### Completion Notes List
 
+- 2026-03-06: 完成管理员独立认证系统实现
+  - 创建 `AdminClaims` 和 `AdminValidator` 用于管理员 JWT Token 生成和验证
+  - 实现 `AdminAuthService` 服务，包含登录验证和 Token 生成
+  - 实现 `AdminAuthRepository` 接口，支持依赖注入和测试 mock
+  - 创建 `AuthHandler` 处理 POST /v1/admin/auth/login 端点
+  - 创建 `AdminAuth` 中间件，支持 Token 验证和角色检查
+  - 创建 `RequireAdminRole` 和 `RequireSuperAdmin` 中间件
+  - 创建 `create-admin` CLI 命令用于创建管理员账号
+  - 所有测试通过，覆盖率达标 (service: 90.0%, jwt: 89.6%, middleware: 90.2%, api/admin: 83.3%)
+
+- 2026-03-06: 代码审查修复
+  - 移除未使用的 `sqlx` 和 `viper` 导入 (HIGH)
+  - 删除未使用的 `initConfig()` 和 `connectDB()` 函数 (HIGH)
+  - 添加密码强度验证 (最小8字符，最大128字符) (MEDIUM)
+  - 添加邮箱格式验证 (MEDIUM)
+  - 添加用户名和名称长度验证 (MEDIUM)
+  - 添加 JWT Issuer claim 用于 token 来源验证 (MEDIUM)
+  - 改进 CLI 测试覆盖率，添加密码/邮箱/用户名验证测试 (MEDIUM)
+
 ### File List
+
+**新增文件:**
+- `backend/pkg/jwt/admin_claims.go` - 管理员 JWT Claims 定义和验证
+- `backend/pkg/jwt/admin_claims_test.go` - JWT Claims 测试
+- `backend/internal/service/admin_auth.go` - 管理员认证服务
+- `backend/internal/service/admin_auth_test.go` - 认证服务测试
+- `backend/internal/api/admin/auth_handler.go` - 管理员认证 API 处理器
+- `backend/internal/api/admin/auth_handler_test.go` - API 测试
+- `backend/pkg/middleware/admin_auth.go` - 管理员认证中间件
+- `backend/pkg/middleware/admin_auth_test.go` - 中间件测试
+- `backend/cmd/admin/main.go` - 管理员 CLI 命令
+- `backend/cmd/admin/main_test.go` - CLI 测试
+
+**修改文件:**
+- `backend/go.mod` - 添加 golang.org/x/term 依赖
+- `backend/go.sum` - 依赖更新
