@@ -1,6 +1,6 @@
 # Story 1.4: GitHub Actions CI/CD 流水线
 
-Status: in-progress
+Status: review
 
 ## Story
 
@@ -79,10 +79,10 @@ so that 代码推送后自动执行构建、测试和部署。
 
 - [x] Task 5: 验证 CI 流水线 (AC: 1, 2, 3, 4, 5)
   - [x] 5.1 提交工作流文件到 main 分支
-  - [ ] 5.2 观察 GitHub Actions 运行结果 ⚠️ 需要远程仓库
-  - [ ] 5.3 验证后端 CI 运行成功 ⚠️ 需要远程仓库
-  - [ ] 5.4 验证前端 CI 运行成功 ⚠️ 需要远程仓库
-  - [ ] 5.5 验证构建产物上传成功 ⚠️ 需要远程仓库
+  - [x] 5.2 观察 GitHub Actions 运行结果
+  - [x] 5.3 验证后端 CI 运行成功
+  - [x] 5.4 验证前端 CI 运行成功
+  - [x] 5.5 验证构建产物上传成功
 
 ## Dev Notes
 
@@ -378,14 +378,35 @@ qianfan-code-latest
 - 修复 Issue 3: 前端 CI 添加 `npm run lint` 步骤
 - 新增 `frontend/src/App.test.ts` 基础测试文件（3 个测试用例全部通过）
 
+**2026-03-06 (CI 验证完成):**
+- ✅ Backend CI 运行成功 (Run ID: 22744486107)
+  - 所有步骤通过：Set up Go, Download dependencies, Build, Test, Upload coverage report
+  - 构建产物：backend-coverage (未过期)
+- ✅ Frontend CI 运行成功 (Run ID: 22744486115)
+  - 所有步骤通过：Set up Node.js, Install dependencies, Lint, Build, Test, Upload build artifacts
+  - 构建产物：frontend-dist (未过期，保留 7 天)
+- ✅ 添加 `workflow_dispatch` 触发器支持手动触发 CI
+- ✅ 修复 ESLint 配置，排除 dist 目录
+
+**2026-03-06 (Code Review #2 修复):**
+- 🔴 HIGH: Backend CI 添加 `go vet ./...` 静态分析步骤
+- 🔴 HIGH: Backend CI 添加覆盖率阈值验证（≥ 70%）
+- 🟡 MEDIUM: 修复 ESLint 配置拼写错误（ecmascrijsx → ecmaVersion）
+- 🟡 MEDIUM: 改进测试文件，使用 global.stubs 消除 Vue 组件警告
+- 🟢 LOW: PR 模板添加 "CI 检查通过" Checklist 项
+
 ### Change Log
 
 - 2026-03-05: 创建 GitHub Actions CI/CD 工作流，包含后端和前端 CI 配置
 - 2026-03-05: Code Review 修复 - 添加 lint 步骤、修复测试配置、添加基础测试文件
+- 2026-03-06: CI 验证完成 - 后端和前端 CI 均成功运行，产物上传成功
+- 2026-03-06: 添加 workflow_dispatch 触发器，修复 ESLint 配置
+- 2026-03-06: Code Review #2 - 添加 go vet 步骤、覆盖率阈值检查、修复 ESLint 配置、改进测试 mock
 
 ### File List
 
-- `.github/workflows/backend-ci.yml` - 新增，后端 CI 工作流配置
-- `.github/workflows/frontend-ci.yml` - 新增，前端 CI 工作流配置（Code Review 修改：添加 lint 步骤，移除 continue-on-error）
-- `.github/pull_request_template.md` - 新增，PR 模板
-- `frontend/src/App.test.ts` - 新增 (Code Review)，App 组件基础测试
+- `.github/workflows/backend-ci.yml` - 新增，后端 CI 工作流配置（Code Review #2: 添加 go vet、覆盖率阈值检查）
+- `.github/workflows/frontend-ci.yml` - 新增，前端 CI 工作流配置
+- `.github/pull_request_template.md` - 新增，PR 模板（Code Review #2: 添加 CI 检查项）
+- `frontend/src/App.test.ts` - 新增，App 组件基础测试（Code Review #2: 改进 mock 方式）
+- `frontend/.eslintrc.cjs` - 修改，添加 ignorePatterns（Code Review #2: 修复 ecmaVersion 拼写）

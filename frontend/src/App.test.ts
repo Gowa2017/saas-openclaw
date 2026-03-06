@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
@@ -16,15 +16,17 @@ const createTestRouter = () =>
     ],
   })
 
-// Mock Naive UI components
-vi.stubGlobal('n-config-provider', { template: '<div><slot /></div>' })
-vi.stubGlobal('n-message-provider', { template: '<div><slot /></div>' })
-vi.stubGlobal('n-layout', { template: '<div class="app-layout"><slot /></div>' })
-vi.stubGlobal('n-layout-sider', { template: '<div><slot /></div>' })
-vi.stubGlobal('n-layout-header', { template: '<div><slot /></div>' })
-vi.stubGlobal('n-layout-content', { template: '<div><slot /></div>' })
-vi.stubGlobal('n-menu', { template: '<div></div>' })
-vi.stubGlobal('n-button', { template: '<button><slot /></button>' })
+// Naive UI 组件 stubs
+const naiveUIStubs = {
+  NConfigProvider: { template: '<div><slot /></div>' },
+  NMessageProvider: { template: '<div><slot /></div>' },
+  NLayout: { template: '<div class="app-layout"><slot /></div>' },
+  NLayoutSider: { template: '<div><slot /></div>' },
+  NLayoutHeader: { template: '<div><slot /></div>' },
+  NLayoutContent: { template: '<div><slot /></div>' },
+  NMenu: { template: '<div></div>' },
+  NButton: { template: '<button><slot /></button>' },
+}
 
 describe('App.vue', () => {
   it('should mount successfully', async () => {
@@ -36,6 +38,7 @@ describe('App.vue', () => {
     const wrapper = mount(App, {
       global: {
         plugins: [router],
+        stubs: naiveUIStubs,
       },
     })
 
@@ -52,6 +55,7 @@ describe('App.vue', () => {
     const wrapper = mount(App, {
       global: {
         plugins: [router],
+        stubs: naiveUIStubs,
       },
     })
 
@@ -68,6 +72,7 @@ describe('App.vue', () => {
     const wrapper = mount(App, {
       global: {
         plugins: [router],
+        stubs: naiveUIStubs,
       },
     })
 
