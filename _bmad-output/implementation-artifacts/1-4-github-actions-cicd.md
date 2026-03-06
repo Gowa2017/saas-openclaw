@@ -1,6 +1,6 @@
 # Story 1.4: GitHub Actions CI/CD 流水线
 
-Status: review
+Status: done
 
 ## Story
 
@@ -394,6 +394,12 @@ qianfan-code-latest
 - 🟡 MEDIUM: 修复 ESLint 配置拼写错误（ecmascrijsx → ecmaVersion）
 - 🟡 MEDIUM: 改进测试文件，使用 global.stubs 消除 Vue 组件警告
 - 🟢 LOW: PR 模板添加 "CI 检查通过" Checklist 项
+
+**⚠️ 已知问题 - 后端测试覆盖率不足:**
+- 当前覆盖率: 45.8%（低于 70% 阈值）
+- Backend CI 会因此失败，这是预期行为
+- CI 配置正确，问题在于后端代码测试不足
+- 建议: 后续 Story 中逐步提高测试覆盖率
 
 ### Change Log
 
