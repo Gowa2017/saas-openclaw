@@ -23,6 +23,9 @@ func TestLoad(t *testing.T) {
 	os.Setenv("DB_SSL_CERT", "/path/to/client.crt")
 	os.Setenv("DB_SSL_KEY", "/path/to/client.key")
 	os.Setenv("LOG_LEVEL", "debug")
+	os.Setenv("JWT_SECRET", "test-jwt-secret")
+	os.Setenv("PLATFORM_BASE_URL", "https://platform.example.com")
+	os.Setenv("PLATFORM_TIMEOUT", "10s")
 
 	defer func() {
 		os.Unsetenv("SERVER_PORT")
@@ -40,6 +43,9 @@ func TestLoad(t *testing.T) {
 		os.Unsetenv("DB_SSL_CERT")
 		os.Unsetenv("DB_SSL_KEY")
 		os.Unsetenv("LOG_LEVEL")
+		os.Unsetenv("JWT_SECRET")
+		os.Unsetenv("PLATFORM_BASE_URL")
+		os.Unsetenv("PLATFORM_TIMEOUT")
 	}()
 
 	cfg, err := Load()
@@ -94,6 +100,18 @@ func TestLoad(t *testing.T) {
 	if cfg.Log.Level != "debug" {
 		t.Errorf("Log.Level = %v, want debug", cfg.Log.Level)
 	}
+
+	if cfg.JWT.Secret != "test-jwt-secret" {
+		t.Errorf("JWT.Secret = %v, want test-jwt-secret", cfg.JWT.Secret)
+	}
+
+	if cfg.Platform.BaseURL != "https://platform.example.com" {
+		t.Errorf("Platform.BaseURL = %v, want https://platform.example.com", cfg.Platform.BaseURL)
+	}
+
+	if cfg.Platform.Timeout != 10*time.Second {
+		t.Errorf("Platform.Timeout = %v, want 10s", cfg.Platform.Timeout)
+	}
 }
 
 func TestLoadDefaults(t *testing.T) {
@@ -112,6 +130,9 @@ func TestLoadDefaults(t *testing.T) {
 	os.Unsetenv("DB_SSL_CERT")
 	os.Unsetenv("DB_SSL_KEY")
 	os.Unsetenv("LOG_LEVEL")
+	os.Unsetenv("JWT_SECRET")
+	os.Unsetenv("PLATFORM_BASE_URL")
+	os.Unsetenv("PLATFORM_TIMEOUT")
 
 	cfg, err := Load()
 	if err != nil {
@@ -159,6 +180,17 @@ func TestLoadDefaults(t *testing.T) {
 	}
 	if cfg.Database.SSLKey != "" {
 		t.Errorf("Database.SSLKey default = %v, want empty", cfg.Database.SSLKey)
+	}
+
+	// JWT and Platform defaults
+	if cfg.JWT.Secret != "" {
+		t.Errorf("JWT.Secret default = %v, want empty", cfg.JWT.Secret)
+	}
+	if cfg.Platform.BaseURL != "" {
+		t.Errorf("Platform.BaseURL default = %v, want empty", cfg.Platform.BaseURL)
+	}
+	if cfg.Platform.Timeout != 5*time.Second {
+		t.Errorf("Platform.Timeout default = %v, want 5s", cfg.Platform.Timeout)
 	}
 }
 

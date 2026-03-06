@@ -12,6 +12,8 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	Log      LogConfig
+	JWT      JWTConfig
+	Platform PlatformConfig
 }
 
 // ServerConfig holds HTTP server configuration
@@ -43,6 +45,17 @@ type LogConfig struct {
 	Level string
 }
 
+// JWTConfig holds JWT authentication configuration
+type JWTConfig struct {
+	Secret string
+}
+
+// PlatformConfig holds platform client configuration
+type PlatformConfig struct {
+	BaseURL string
+	Timeout time.Duration
+}
+
 // Load reads configuration from environment variables and config files
 func Load() (*Config, error) {
 	viper.SetConfigName("config")
@@ -65,6 +78,9 @@ func Load() (*Config, error) {
 	viper.SetDefault("DB_SSL_CERT", "")
 	viper.SetDefault("DB_SSL_KEY", "")
 	viper.SetDefault("LOG_LEVEL", "info")
+	viper.SetDefault("JWT_SECRET", "")
+	viper.SetDefault("PLATFORM_BASE_URL", "")
+	viper.SetDefault("PLATFORM_TIMEOUT", "5s")
 
 	// Read from environment variables
 	viper.AutomaticEnv()
@@ -76,6 +92,7 @@ func Load() (*Config, error) {
 		"DB_NAME", "DB_SSLMODE", "DB_MAX_OPEN_CONNS", "DB_MAX_IDLE_CONNS",
 		"DB_CONN_MAX_LIFETIME", "DB_CONN_MAX_IDLE_TIME",
 		"DB_SSL_ROOT_CERT", "DB_SSL_CERT", "DB_SSL_KEY", "LOG_LEVEL",
+		"JWT_SECRET", "PLATFORM_BASE_URL", "PLATFORM_TIMEOUT",
 	}
 	for _, env := range envVars {
 		_ = viper.BindEnv(env)
@@ -111,6 +128,13 @@ func Load() (*Config, error) {
 		},
 		Log: LogConfig{
 			Level: viper.GetString("LOG_LEVEL"),
+		},
+		JWT: JWTConfig{
+			Secret: viper.GetString("JWT_SECRET"),
+		},
+		Platform: PlatformConfig{
+			BaseURL: viper.GetString("PLATFORM_BASE_URL"),
+			Timeout: viper.GetDuration("PLATFORM_TIMEOUT"),
 		},
 	}
 

@@ -15,8 +15,10 @@ import (
 	"github.com/gowa/saas-openclaw/backend/internal/api/health"
 	"github.com/gowa/saas-openclaw/backend/internal/infrastructure/config"
 	"github.com/gowa/saas-openclaw/backend/internal/infrastructure/database"
+	"github.com/gowa/saas-openclaw/backend/internal/infrastructure/platform"
 	customLogger "github.com/gowa/saas-openclaw/backend/pkg/logger"
 	"github.com/gowa/saas-openclaw/backend/pkg/middleware"
+	"github.com/gowa/saas-openclaw/backend/pkg/jwt"
 )
 
 func main() {
@@ -52,11 +54,27 @@ func main() {
 
 	logger.Info("Database connection established")
 
-	// TODO: Initialize validator for request validation
-	// val, err := validator.New()
-	// if err != nil {
-	//     logger.Fatal("Failed to initialize validator", zap.Error(err))
-	// }
+	// Initialize JWT validator
+	var jwtValidator *jwt.Validator
+	if cfg.JWT.Secret != "" {
+		jwtValidator = jwt.NewValidator(cfg.JWT.Secret)
+		logger.Info("JWT validator initialized")
+	} else {
+		logger.Warn("JWT_SECRET not configured, authentication middleware will not work")
+	}
+
+	// Initialize platform client
+	var platformClient *platform.Client
+	if cfg.Platform.BaseURL != "" {
+		platformClient = platform.NewClient(cfg.Platform.BaseURL,
+			platform.WithTimeout(cfg.Platform.Timeout),
+		)
+		logger.Info("Platform client initialized",
+			zap.String("baseURL", cfg.Platform.BaseURL),
+		)
+	} else {
+		logger.Warn("PLATFORM_BASE_URL not configured, platform integration will not work")
+	}
 
 	// Initialize Gin router
 	router := gin.New()
@@ -77,11 +95,46 @@ func main() {
 	// API v1 routes
 	v1 := router.Group("/v1")
 	{
+		// Public routes
 		v1.GET("/ping", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"message": "pong",
 			})
 		})
+	}
+
+	// Protected routes (require authentication)
+	if jwtValidator != nil && platformClient != nil {
+		protected := router.Group("/v1")
+		protected.Use(middleware.PlatformAuth(jwtValidator, platformClient))
+		{
+			// Get current user info
+			protected.GET("/me", func(c *gin.Context) {
+				user := middleware.GetCurrentUser(c)
+				if user == nil {
+					c.JSON(http.StatusUnauthorized, gin.H{
+						"data": nil,
+						"error": gin.H{
+							"code":    "UNAUTHORIZED",
+							"message": "User not authenticated",
+						},
+						"meta": nil,
+					})
+					return
+				}
+				c.JSON(http.StatusOK, gin.H{
+					"data": gin.H{
+						"id":       user.ID,
+						"name":     user.Name,
+						"email":    user.Email,
+						"tenantId": user.TenantID,
+						"role":     user.Role,
+					},
+					"error": nil,
+					"meta":  nil,
+				})
+			})
+		}
 	}
 
 	// Create HTTP server
